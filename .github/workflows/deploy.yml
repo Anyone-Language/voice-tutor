@@ -35,7 +35,7 @@ jobs:
         run: |
           cd voice-tutor
           cp -f public/index.html index.html
-          npm run build
+          npm run build -- --base=/voice-tutor/
       - uses: actions/configure-pages@v5
         with:
           enablement: true
@@ -44,4 +44,3 @@ jobs:
           path: voice-tutor/dist
       - id: deployment
         uses: actions/deploy-pages@v4
-
