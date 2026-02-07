@@ -34,6 +34,7 @@ jobs:
       - name: Build project
         run: |
           cd voice-tutor
+          cp -f public/index.html index.html
           npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -41,3 +42,4 @@ jobs:
           path: voice-tutor/dist
       - id: deployment
         uses: actions/deploy-pages@v4
+
