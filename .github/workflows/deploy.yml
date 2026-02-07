@@ -30,10 +30,12 @@ jobs:
 
       - name: Unzip project
         run: unzip -o 'voice-tutor (1)-updated.zip' -d .
+        
 
       - name: Install dependencies
         run: |
           cd voice-tutor
+              mv public/index.html index.html
           npm install
 
       - name: Build project
