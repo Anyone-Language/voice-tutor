@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd voice-tutor
-          npm ci
+          npm install
 
       - name: Build project
         run: |
