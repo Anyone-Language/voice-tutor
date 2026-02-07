@@ -27,7 +27,7 @@ jobs:
           node-version: 18
           cache: 'npm'
       - name: Unzip project
-        run: unzip -o 'voice-tutor (1).zip' -d app
+        run: unzip -o 'anyone language.zip' -d app
       - name: Install dependencies
         working-directory: app
         run: npm install --legacy-peer-deps
