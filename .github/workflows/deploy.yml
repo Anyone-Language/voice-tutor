@@ -1,14 +1,11 @@
 name: Deploy PWA
-
 on:
   push:
     branches: [ "main" ]
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -21,26 +18,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Unzip project
         run: unzip -o 'voice-tutor (1).zip' -d .
+
       - name: Install dependencies
         run: |
           cd voice-tutor
           npm install
+
       - name: Build project
         run: |
           cd voice-tutor
+          # Convert absolute asset paths to relative
+          sed -i 's,href=\"/,href=\",g' public/index.html
+          sed -i 's,src=\"/,src=\",g' public/index.html
           cp -f public/index.html index.html
           npm run build -- --base=/voice-tutor/
+
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: voice-tutor/dist
+
       - id: deployment
         uses: actions/deploy-pages@v4
