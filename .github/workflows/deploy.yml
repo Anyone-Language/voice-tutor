@@ -36,8 +36,8 @@ jobs:
         run: |
           cd voice-tutor
           # Convert absolute asset paths to relative
-          sed -i 's,href=\"/,href=\",g' public/index.html
-          sed -i 's,src=\"/,src=\",g' public/index.html
+          sed -i 's|href=\"/|href=\"|g' public/index.html
+          sed -i 's|src=\"/|src=\"|g' public/index.html
           cp -f public/index.html index.html
           npm run build -- --base=/voice-tutor/
 
