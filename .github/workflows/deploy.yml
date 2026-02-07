@@ -35,16 +35,19 @@ jobs:
       - name: Build project
         run: |
           cd voice-tutor
-          # Convert absolute asset paths to relative in the source index.html
-          sed -i 's|href="/|href="|g' public/index.html
-          sed -i 's|src="/|src="|g' public/index.html
-          cp -f public/index.html index.html
-          # Build with base path for GitHub Pages
-          npm run build -- --base=/voice-tutor/
-          # After build, remove leading /voice-tutor/ from asset URLs in dist/index.html
-          sed -i 's|="/voice-tutor/|="|g' dist/index.html
-
-      - uses: actions/configure-pages@v5
+          #     cd voice-tutor
+    # Remove manual service worker registration script
+    sed -i '/navigator.serviceWorker/,/<\/script>/d' public/index.html
+    # Convert absolute asset paths to relative in the source index.html
+    sed -i 's|href="/|href="|g' public/index.html
+    sed -i 's|src="/|src="|g' public/index.html
+    # Copy patched index.html to repository root for GitHub Pages
+    cp -f public/index.html index.html
+    # Build with base path for GitHub Pages
+    npm run build -- --base=/voice-tutor/
+    # After build, remove leading /voice-tutor/ from asset URLs in dist/index.html
+    sed -i 's|="/voice-tutor/|="|g' dist/index.html/index.html
+         onfigure-pages@v5
         with:
           enablement: true
 
