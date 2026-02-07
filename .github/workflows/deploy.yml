@@ -25,9 +25,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          
       - name: Unzip project
-        run: unzip -o 'anyone language.zip' -d app
+        # Unzip the updated source archive. Use the explicit file name uploaded to the repo.
+        run: unzip -o 'anyone_language_updated2.zip' -d app
       - name: Install dependencies
         working-directory: app
         run: npm install --legacy-peer-deps
@@ -40,6 +40,9 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist
+          name: github-pages-${{ github.run_id }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}
