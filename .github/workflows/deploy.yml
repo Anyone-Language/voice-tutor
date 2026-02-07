@@ -30,18 +30,87 @@ jobs:
 
       - name: Unzip project
         run: unzip -o 'voice-tutor (1)-updated.zip' -d .
-        
+
+      - name: Prepare project
+        run: |
+          cd voice-tutor
+          # Ensure index.html exists at root
+          if [ -f public/index.html ]; then
+            mv public/index.html index.html
+          fi
+          # Remove any manual service worker to avoid conflicts
+          rm -f public/sw.js
+          # Overwrite vite.config.ts with subpath-safe PWA configuration
+          cat > vite.config.ts <<'EOF'
+          import { defineConfig } from 'vite';
+          import react from '@vitejs/plugin-react';
+          import { VitePWA } from 'vite-plugin-pwa';
+
+          export default defineConfig({
+            base: '/voice-tutor/',
+            plugins: [
+              react(),
+              VitePWA({
+                injectRegister: 'auto',
+                registerType: 'autoUpdate',
+                workbox: {
+                  cleanupOutdatedCaches: true
+                },
+                includeAssets: [
+                  'favicon.ico',
+                  'apple-touch-icon.png',
+                  'icons/icon-192.png',
+                  'icons/icon-512.png',
+                  'icons/maskable-icon.png'
+                ],
+                manifest: {
+                  name: 'VoiceTutor',
+                  short_name: 'VoiceTutor',
+                  description: 'Voice to voice language learning PWA',
+                  start_url: '/voice-tutor/',
+                  scope: '/voice-tutor/',
+                  display: 'standalone',
+                  background_color: '#ffffff',
+                  theme_color: '#48bb78',
+                  icons: [
+                    {
+                      src: 'icons/icon-192.png',
+                      sizes: '192x192',
+                      type: 'image/png'
+                    },
+                    {
+                      src: 'icons/icon-512.png',
+                      sizes: '512x512',
+                      type: 'image/png'
+                    },
+                    {
+                      src: 'icons/maskable-icon.png',
+                      sizes: '512x512',
+                      type: 'image/png',
+                      purpose: 'maskable'
+                    }
+                  ]
+                }
+              })
+            ],
+            server: {
+              port: 5173,
+              open: true
+            }
+          });
+          EOF
 
       - name: Install dependencies
         run: |
           cd voice-tutor
-              mv public/index.html index.html
           npm install
 
       - name: Build project
         run: |
           cd voice-tutor
           npm run build
+          # Create 404.html for SPA fallback
+          cp dist/index.html dist/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
