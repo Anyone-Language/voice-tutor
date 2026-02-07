@@ -1,0 +1,48 @@
+name: Deploy PWA
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Unzip project
+        # Unzip the updated source archive. Use the explicit file name uploaded to the repo.
+        run: unzip -o 'anyone_language_updated2.zip' -d app
+      - name: Install dependencies
+        working-directory: app
+        run: npm install --legacy-peer-deps
+      - name: Build
+        working-directory: app
+        run: npm run build
+      - name: Copy 404.html
+        run: cp app/dist/index.html app/dist/404.html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+          name: github-pages-${{ github.run_id }}
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}
