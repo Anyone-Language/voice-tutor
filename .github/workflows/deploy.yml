@@ -1,21 +1,25 @@
 name: Deploy PWA
+
 on:
   push:
     branches: [ "main" ]
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -25,35 +29,26 @@ jobs:
           node-version: 18
 
       - name: Unzip project
-        run: unzip -o 'voice-tutor (1).zip' -d .
+        run: unzip -o 'voice-tutor (1)-updated.zip' -d .
 
       - name: Install dependencies
         run: |
           cd voice-tutor
-          npm install
+          npm ci
 
       - name: Build project
         run: |
           cd voice-tutor
-          #     cd voice-tutor
-    # Remove manual service worker registration script
-    sed -i '/navigator.serviceWorker/,/<\/script>/d' public/index.html
-    # Convert absolute asset paths to relative in the source index.html
-    sed -i 's|href="/|href="|g' public/index.html
-    sed -i 's|src="/|src="|g' public/index.html
-    # Copy patched index.html to repository root for GitHub Pages
-    cp -f public/index.html index.html
-    # Build with base path for GitHub Pages
-    npm run build -- --base=/voice-tutor/
-    # After build, remove leading /voice-tutor/ from asset URLs in dist/index.html
-    sed -i 's|="/voice-tutor/|="|g' dist/index.html/index.html
-         onfigure-pages@v5
-        with:
-          enablement: true
+          npm run build
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: voice-tutor/dist
 
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
