@@ -26,8 +26,8 @@ jobs:
         with:
           node-version: 18
       - name: Unzip project
-        # Unzip the updated source archive. Use the explicit file name uploaded to the repo.
-        run: unzip -o 'anyone_language_updated2.zip' -d app
+        # Use the clean source zip uploaded to the repository.
+        run: unzip -o 'new_anyone_language.zip' -d app
       - name: Install dependencies
         working-directory: app
         run: npm install --legacy-peer-deps
@@ -37,12 +37,10 @@ jobs:
       - name: Copy 404.html
         run: cp app/dist/index.html app/dist/404.html
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        # Use the stable v2 release of upload-pages-artifact to avoid duplicate artifacts issues.
+        uses: actions/upload-pages-artifact@v2
         with:
           path: app/dist
-          name: github-pages-${{ github.run_id }}
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: github-pages-${{ github.run_id }}
+        uses: actions/deploy-pages@v1
